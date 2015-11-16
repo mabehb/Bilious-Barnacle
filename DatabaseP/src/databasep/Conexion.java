@@ -4,91 +4,25 @@
  * and open the template in the editor.
  */
 package databasep;
-
-/**
- *
- * @author Ma. Belen
- */
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
+import java.sql.*;
 public class Conexion {
-    
-    Connection conexion;
-/**
-* Método utilizado para recuperar el valor del atributo conexion
-* @return conexion contiene el estado de la conexión
-*
-*/
-public Connection getConexion()
-{
-   return conexion;
-}
- 
-/**
-* Método utilizado para establecer la conexión con la base de datos
-* @return estado regresa el estado de la conexión, true si se estableció la conexión,
-* falso en caso contrario
-*/
-public boolean crearConexion()
-{
-   try {
-      Class.forName("com.mysql.jdbc.Driver");
-      conexion = DriverManager.getConnection("jdbc:mysql://host:puerto/baseDatos","usuario","contraseña");
-   } catch (SQLException ex) {
-      ex.printStackTrace();
-      return false;
-   } catch (ClassNotFoundException ex) {
-      ex.printStackTrace();
-      return false;
+   private static Connection cnx = null;
+   public static Connection obtener() throws SQLException, ClassNotFoundException {
+      if (cnx == null) {
+         try {
+            Class.forName("com.mysql.jdbc.Driver");
+            cnx = DriverManager.getConnection("jdbc:mysql://localhost/proyectodatos", "root", "");
+         } catch (SQLException ex) {
+            throw new SQLException(ex);
+         } catch (ClassNotFoundException ex) {
+            throw new ClassCastException(ex.getMessage());
+         }
+      }
+      return cnx;
    }
- 
-   return true;
-}
- 
-/**
-*
-*Método utilizado para realizar las instrucciones: INSERT, DELETE y UPDATE
-*@param sql Cadena que contiene la instrucción SQL a ejecutar
-*@return estado regresa el estado de la ejecución, true(éxito) o false(error)
-*
-*/
-public boolean ejecutarSQL(String sql)
-{
-   try {
-      Statement sentencia = conexion.createStatement();
-      sentencia.executeUpdate(sql);
-   } catch (SQLException ex) {
-      ex.printStackTrace();
-   return false;
+   public static void cerrar() throws SQLException {
+      if (cnx != null) {
+         cnx.close();
+      }
    }
- 
-   return true;
-}
- 
-/**
-*
-*Método utilizado para realizar la instrucción SELECT
-*@param sql Cadena que contiene la instrucción SQL a ejecutar
-*@return resultado regresa los registros generados por la consulta
-*
-*/
-public ResultSet ejecutarSQLSelect(String sql)
-{
-   ResultSet resultado;
-   try {
-      Statement sentencia = conexion.createStatement();
-      resultado = sentencia.executeQuery(sql);
-   } catch (SQLException ex) {
-      ex.printStackTrace();
-      return null;
-   }
- 
-   return resultado;
-}
-    
 }
